@@ -124,4 +124,12 @@ public class FiveInARowTest {
         game.place(0, 0, Placement.PLAYER);
         assertFalse(game.isPlayerTurn());
     }
+
+    @Test
+    public void testCompMove() {
+        FiveInARow game = new FiveInARow(true);
+        game.place(0, 0, Placement.PLAYER);
+        MoveInfo p = game.findCompMove(true);
+        game.place(p.x(), p.y(), Placement.COMPUTER);
+    }
 }
