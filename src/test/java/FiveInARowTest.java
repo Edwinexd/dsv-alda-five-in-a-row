@@ -132,4 +132,50 @@ public class FiveInARowTest {
         MoveInfo p = game.findCompMove(true);
         game.place(p.x(), p.y(), Placement.COMPUTER);
     }
+
+    @Test
+    public void testLookForHorizontalSegments() {
+        FiveInARow game = new FiveInARow(true);
+        game.place(1, 0, Placement.PLAYER);
+        game.place(14, 0, Placement.COMPUTER);
+        game.place(2, 0, Placement.PLAYER);
+        game.place(13, 0, Placement.COMPUTER);
+        game.place(3, 0, Placement.PLAYER);
+        game.place(12, 0, Placement.COMPUTER);
+        game.place(4, 0, Placement.PLAYER);
+        game.place(11, 0, Placement.COMPUTER);
+        assertNotNull(game.immediatePlayerWin());
+        assertEquals(2, game.getSegments(Placement.PLAYER).stream().findFirst().get().openEnds());
+    }
+
+    @Test
+    public void testLookForVerticalSegments() {
+        FiveInARow game = new FiveInARow(true);
+        game.place(0, 1, Placement.PLAYER);
+        game.place(0, 14, Placement.COMPUTER);
+        game.place(0, 2, Placement.PLAYER);
+        game.place(0, 13, Placement.COMPUTER);
+        game.place(0, 3, Placement.PLAYER);
+        game.place(0, 12, Placement.COMPUTER);
+        game.place(0, 4, Placement.PLAYER);
+        game.place(0, 11, Placement.COMPUTER);
+        assertNotNull(game.immediatePlayerWin());
+        assertEquals(2, game.getSegments(Placement.PLAYER).stream().findFirst().get().openEnds());
+    }
+
+    @Test
+    public void testLookForDiagonalSegments() {
+        FiveInARow game = new FiveInARow(true);
+        game.place(1, 1, Placement.PLAYER);
+        game.place(14, 14, Placement.COMPUTER);
+        game.place(2, 2, Placement.PLAYER);
+        game.place(13, 13, Placement.COMPUTER);
+        game.place(3, 3, Placement.PLAYER);
+        game.place(12, 12, Placement.COMPUTER);
+        game.place(4, 4, Placement.PLAYER);
+        game.place(11, 11, Placement.COMPUTER);
+        assertNotNull(game.immediatePlayerWin());
+        assertEquals(2, game.getSegments(Placement.PLAYER).stream().findFirst().get().openEnds());
+        assertEquals(null, game.getSegments(Placement.COMPUTER));
+    }
 }
