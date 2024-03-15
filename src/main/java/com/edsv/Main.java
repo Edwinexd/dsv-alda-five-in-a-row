@@ -41,7 +41,7 @@ public class Main {
         System.out.println(p.x() + " " + p.y() + " " + p.result());
         game.printBoard();
 
-        game.place(4, 0, Placement.PLAYER);
+        game.place(5, 0, Placement.PLAYER);
         p = game.findCompMove();
         game.place(p.x(), p.y(), Placement.COMPUTER);
         game.printBoard();
@@ -50,6 +50,7 @@ public class Main {
     public static void testCompVsComp() {
         FiveInARow game = new FiveInARow(true);
         while (true) {
+            System.out.println(game.getSegmentsCount(Placement.PLAYER));
             MoveInfo p = game.findPlayerMove(3, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println(p + ", " + Placement.PLAYER);
             game.place(p.x(), p.y(), Placement.PLAYER);

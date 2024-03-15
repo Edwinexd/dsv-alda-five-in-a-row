@@ -1,7 +1,10 @@
 package com.edsv;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 // TODO: This game is called gomoku
 public class FiveInARow {
@@ -142,6 +145,133 @@ public class FiveInARow {
             }
         }
         return true;
+    }
+
+    public TreeMap<Segment, Integer> getSegmentsCount(Placement player) {
+        TreeMap<Segment, Integer> segments = new TreeMap<>();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (board[i][j] != player) {
+                    continue;
+                }
+                // Check horizontal
+                int count = 1;
+                int openEnds = 0;
+                for (int k = i - 1; k >= 0; k--) {
+                    if (board[k][j] == player) {
+                        count++;
+                    } else if (board[k][j] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                for (int k = i + 1; k < BOARD_SIZE; k++) {
+                    if (board[k][j] == player) {
+                        count++;
+                    } else if (board[k][j] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                if (openEnds > 0 && count > 1 || count == WINNING_COUNT) {
+                    Segment segment = new Segment(count, openEnds);
+                    segments.put(segment, segments.getOrDefault(segment, 0) + 1);
+                }
+
+                // Check vertical
+                count = 1;
+                openEnds = 0;
+                for (int k = j - 1; k >= 0; k--) {
+                    if (board[i][k] == player) {
+                        count++;
+                    } else if (board[i][k] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                for (int k = j + 1; k < BOARD_SIZE; k++) {
+                    if (board[i][k] == player) {
+                        count++;
+                    } else if (board[i][k] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                if (openEnds > 0 && count > 1 || count == WINNING_COUNT) {
+                    Segment segment = new Segment(count, openEnds);
+                    segments.put(segment, segments.getOrDefault(segment, 0) + 1);
+                }
+
+                // Check diagonal
+                count = 1;
+                openEnds = 0;
+                for (int k = i - 1, l = j - 1; k >= 0 && l >= 0; k--, l--) {
+                    if (board[k][l] == player) {
+                        count++;
+                    } else if (board[k][l] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                for (int k = i + 1, l = j + 1; k < BOARD_SIZE && l < BOARD_SIZE; k++, l++) {
+                    if (board[k][l] == player) {
+                        count++;
+                    } else if (board[k][l] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                if (openEnds > 0 && count > 1 || count == WINNING_COUNT) {
+                    Segment segment = new Segment(count, openEnds);
+                    segments.put(segment, segments.getOrDefault(segment, 0) + 1);
+                }
+
+                // Check other diagonal
+                count = 1;
+                openEnds = 0;
+                for (int k = i - 1, l = j + 1; k >= 0 && l < BOARD_SIZE; k--, l++) {
+                    if (board[k][l] == player) {
+                        count++;
+                    } else if (board[k][l] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                for (int k = i + 1, l = j - 1; k < BOARD_SIZE && l >= 0; k++, l--) {
+                    if (board[k][l] == player) {
+                        count++;
+                    } else if (board[k][l] == null) {
+                        openEnds++;
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                if (openEnds > 0 && count > 1 || count == WINNING_COUNT) {
+                    Segment segment = new Segment(count, openEnds);
+                    segments.put(segment, segments.getOrDefault(segment, 0) + 1);
+                }
+            }
+        }
+        // Since segments of size n appear n to many times in the map we divide by n for each key before returning
+        for (Segment segment : segments.keySet()) {
+            segments.put(segment, segments.get(segment) / segment.length());
+        }
+        return segments;
     }
 
     public TreeSet<Segment> getSegments(Placement player) {
@@ -295,7 +425,8 @@ public class FiveInARow {
         // Find best computer segment: most in a row and most open ends
         int computerMaxLength = 0;
         int computerMaxOpenEnds = 0;
-        // TODO: They are already sorted, we only need to return the best in getSegments()
+        // TODO: They are already sorted, we only need to return the best in
+        // getSegments()
         for (Segment segment : computerSegments) {
             if (segment.length() > computerMaxLength) {
                 computerMaxLength = segment.length();
@@ -314,10 +445,11 @@ public class FiveInARow {
             return Integer.MIN_VALUE;
         }
         // TODO: This comparison should be done via segments.compare or something
-        // TODO: Take into account that a 3v3 where one has one more open end is not a massive advantage
+        // TODO: Take into account that a 3v3 where one has one more open end is not a
+        // massive advantage
         // TODO: Take into account the number of segments
         if (computerMaxLength > maxLength) {
-            if (computerMaxLength == 4 ) {
+            if (computerMaxLength == 4) {
                 return 10000; // 20 000 case is taken care of as a full on victory
             } else if (computerMaxLength == 3) {
                 if (computerMaxOpenEnds == 2) {
@@ -349,7 +481,7 @@ public class FiveInARow {
                 }
             }
         }
-        
+
         if (computerMaxOpenEnds > maxOpenEnds) {
             return 100;
         } else if (computerMaxOpenEnds < maxOpenEnds) {
@@ -359,30 +491,51 @@ public class FiveInARow {
         return 0;
     }
 
-    public MoveInfo immediateCompWin() {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (isEmpty(i, j)) {
-                    place(i, j, Placement.COMPUTER);
-                    if (isVictoryMove(i, j)) {
-                        unplace(i, j);
-                        return new MoveInfo(i, j, Integer.MAX_VALUE);
-                    }
-                    unplace(i, j);
-                }
+    public int evaluateUsingCounts() {
+        TreeMap<Segment, Integer> playerSegments = getSegmentsCount(Placement.PLAYER);
+        TreeMap<Segment, Integer> computerSegments = getSegmentsCount(Placement.COMPUTER);
+
+        while(!playerSegments.isEmpty() && !computerSegments.isEmpty()) {
+            Entry<Segment, Integer> playerEntry = playerSegments.pollLastEntry();
+            Entry<Segment, Integer> computerEntry = computerSegments.pollLastEntry();
+            if (computerEntry.getKey().compareTo(playerEntry.getKey()) > 0) {
+                return calculateSegmentValue(computerEntry);
+            } else if (computerEntry.getKey().compareTo(playerEntry.getKey()) < 0) {
+                return -calculateSegmentValue(playerEntry);
             }
         }
-        return null;
+        if (playerSegments.isEmpty() && computerSegments.isEmpty()) {
+            return 0;
+        }
+        if (playerSegments.isEmpty()) {
+            return -calculateSegmentValue(computerSegments.pollLastEntry());
+        }
+        return calculateSegmentValue(playerSegments.pollLastEntry());
     }
 
-    public MoveInfo immediatePlayerWin() {
+    private int calculateSegmentValue(Entry<Segment, Integer> entry) {
+        int responseValue = 1;
+        for (int i = 0; i < entry.getKey().length(); i++) {
+            responseValue *= 10;
+        }
+        responseValue *= entry.getKey().openEnds();
+        responseValue *= Math.min(entry.getValue(), 4); // may seem arbitrary but it's to ensure that a 
+                                                          // higher length evaluates higher
+        return responseValue;
+    }
+
+    public MoveInfo immediateWin(Placement playerType) {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (isEmpty(i, j)) {
-                    place(i, j, Placement.PLAYER);
+                    place(i, j, playerType);
                     if (isVictoryMove(i, j)) {
                         unplace(i, j);
-                        return new MoveInfo(i, j, Integer.MIN_VALUE);
+                        if (playerType == Placement.COMPUTER) {
+                            return new MoveInfo(i, j, Integer.MAX_VALUE);
+                        } else {
+                            return new MoveInfo(i, j, Integer.MIN_VALUE);
+                        }
                     }
                     unplace(i, j);
                 }
@@ -411,18 +564,17 @@ public class FiveInARow {
         int bestValue = alpha;
         int[] bestMove = { -1, -1 };
 
-
         if (isFull()) {
             return new MoveInfo(-1, -1, 0);
         }
-        MoveInfo quickWin = immediateCompWin();
+        MoveInfo quickWin = immediateWin(Placement.COMPUTER);
         if (quickWin != null) {
             return quickWin;
         }
 
         // TODO: This check is in the wrong place, should be by responseValue
         // if (remainingDepth == 0) {
-            // return new MoveInfo(-1, -1, evaluate());
+        // return new MoveInfo(-1, -1, evaluate());
         // }
 
         for (int i = 0; i < BOARD_SIZE && bestValue < beta; i++) {
@@ -432,17 +584,14 @@ public class FiveInARow {
                 }
                 place(i, j, Placement.COMPUTER);
                 if (remainingDepth == 0) {
-                    responseValue = evaluate();
+                    responseValue = evaluateUsingCounts();
                 } else {
-                    responseValue = findPlayerMove(remainingDepth-1, bestValue, beta).result();
+                    responseValue = findPlayerMove(remainingDepth - 1, bestValue, beta).result();
                 }
                 unplace(i, j);
                 if (responseValue > bestValue) {
                     bestValue = responseValue;
                     bestMove = new int[] { i, j };
-                    if (responseValue == Integer.MAX_VALUE) {
-                        break;
-                    }
                 } else if (responseValue == bestValue && bestMove[0] == -1) {
                     bestMove = new int[] { i, j };
                 }
@@ -459,9 +608,9 @@ public class FiveInARow {
         int[] bestMove = { -1, -1 };
 
         if (isFull()) {
-            return new MoveInfo(-1,-1, 0);
+            return new MoveInfo(-1, -1, 0);
         }
-        MoveInfo quickWin = immediatePlayerWin();
+        MoveInfo quickWin = immediateWin(Placement.PLAYER);
         if (quickWin != null) {
             return quickWin;
         }
@@ -472,24 +621,20 @@ public class FiveInARow {
                 }
                 place(i, j, Placement.PLAYER);
                 if (remainingDepth == 0) {
-                    responseValue = evaluate();
+                    responseValue = evaluateUsingCounts();
                 } else {
-                    responseValue = findCompMove(remainingDepth-1, alpha, bestValue).result();
+                    responseValue = findCompMove(remainingDepth - 1, alpha, bestValue).result();
                 }
                 unplace(i, j);
-                if (responseValue < bestValue || bestMove[0] == -1) {
+                if (responseValue < bestValue) {
                     bestValue = responseValue;
                     bestMove = new int[] { i, j };
-                    if (responseValue == Integer.MIN_VALUE) {
-                        break;
-                    }
                 } else if (responseValue == bestValue && bestMove[0] == -1) {
                     bestMove = new int[] { i, j };
                 }
             }
         }
         return new MoveInfo(bestMove[0], bestMove[1], bestValue);
-
     }
 
     public void printBoard() {
