@@ -1,7 +1,7 @@
 package com.edsv;
 
 import java.util.Scanner;
-import java.util.TreeSet;
+import java.util.Set;
 
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
@@ -60,7 +60,7 @@ public class Main {
             game.printBoard();
             // Check if victory has been achieved
             // get segments for player
-            TreeSet<Segment> segments = game.getSegments(Placement.PLAYER);
+            Set<Segment> segments = game.getSegmentsCount(Placement.PLAYER).keySet();
             for (Segment s : segments) {
                 if (s.length() == 5) {
                     System.out.println("Player wins");
@@ -68,7 +68,7 @@ public class Main {
                 }
             }
             // get segments for computer
-            segments = game.getSegments(Placement.COMPUTER);
+            segments = game.getSegmentsCount(Placement.COMPUTER).keySet();
             for (Segment s : segments) {
                 if (s.length() == 5) {
                     System.out.println("Computer wins");
