@@ -253,9 +253,9 @@ public class FiveInARow {
                     if (isVictoryMove(i, j)) {
                         unplace(i, j);
                         if (playerType == Placement.COMPUTER) {
-                            return new MoveInfo(i, j, Integer.MAX_VALUE);
+                            return new MoveInfo(i, j, Integer.MAX_VALUE - 1);
                         } else {
-                            return new MoveInfo(i, j, Integer.MIN_VALUE);
+                            return new MoveInfo(i, j, Integer.MIN_VALUE + 1);
                         }
                     }
                     unplace(i, j);
@@ -278,18 +278,18 @@ public class FiveInARow {
     }
 
     private MoveInfo findCompMove(int remainingDepth, int alpha, int beta) {
-        MoveInfo bestMove = new MoveInfo(-1, -1, alpha);
+        MoveInfo bestMove = new MoveInfo(-1, -1, Integer.MIN_VALUE);
 
         if (isFull()) {
-            return new MoveInfo(-1, -1, 0);
+            return new MoveInfo(-1, -1, evaluateUsingCounts());
         }
         MoveInfo quickWin = immediateWin(Placement.COMPUTER);
         if (quickWin != null) {
             return quickWin;
         }
 
-        for (int i = 0; i < BOARD_SIZE && bestMove.result() < beta; i++) {
-            for (int j = 0; j < BOARD_SIZE && bestMove.result() < beta; j++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
                 if (!isEmpty(i, j)) {
                     continue;
                 }
@@ -298,17 +298,20 @@ public class FiveInARow {
                 if (remainingDepth == 0) {
                     responseValue = evaluateUsingCounts();
                 } else {
-                    responseValue = findPlayerMove(remainingDepth - 1, bestMove.result(), beta).result();
+                    responseValue = findPlayerMove(remainingDepth - 1, alpha, beta).result();
                 }
                 unplace(i, j);
+                if (responseValue > alpha) {
+                    alpha = responseValue;
+                }
+                if (alpha >= beta) {
+                    return new MoveInfo(i, j, responseValue);
+                }
                 if (responseValue > bestMove.result()) {
-                    bestMove = new MoveInfo(i, j, responseValue);
-                } else if (responseValue == bestMove.result() && bestMove.x() == -1) {
                     bestMove = new MoveInfo(i, j, responseValue);
                 }
             }
         }
-
         return bestMove;
     }
 
@@ -317,17 +320,17 @@ public class FiveInARow {
     }
 
     private MoveInfo findPlayerMove(int remainingDepth, int alpha, int beta) {
-        MoveInfo bestMove = new MoveInfo(-1, -1, beta);
+        MoveInfo bestMove = new MoveInfo(-1, -1, Integer.MAX_VALUE);
 
         if (isFull()) {
-            return new MoveInfo(-1, -1, 0);
+            return new MoveInfo(-1, -1, evaluateUsingCounts());
         }
         MoveInfo quickWin = immediateWin(Placement.PLAYER);
         if (quickWin != null) {
             return quickWin;
         }
-        for (int i = 0; i < BOARD_SIZE && bestMove.result() > alpha; i++) {
-            for (int j = 0; j < BOARD_SIZE && bestMove.result() > alpha; j++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
                 if (!isEmpty(i, j)) {
                     continue;
                 }
@@ -336,12 +339,16 @@ public class FiveInARow {
                 if (remainingDepth == 0) {
                     responseValue = evaluateUsingCounts();
                 } else {
-                    responseValue = findCompMove(remainingDepth - 1, alpha, bestMove.result()).result();
+                    responseValue = findCompMove(remainingDepth - 1, alpha, beta).result();
                 }
                 unplace(i, j);
+                if (responseValue < beta) {
+                    beta = responseValue;
+                }
+                if (beta <= alpha) {
+                    return new MoveInfo(i, j, responseValue);
+                }
                 if (responseValue < bestMove.result()) {
-                    bestMove = new MoveInfo(i, j, responseValue);
-                } else if (responseValue == bestMove.result() && bestMove.x() == -1) {
                     bestMove = new MoveInfo(i, j, responseValue);
                 }
             }
@@ -350,9 +357,20 @@ public class FiveInARow {
     }
 
     public void printBoard() {
-        System.out.println("---------------");
+        for (int i = 0; i < BOARD_SIZE * 4 + 1; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
+        System.out.print("|");
         for (int i = 0; i < BOARD_SIZE; i++) {
+            // space so it takes exactly 2 characters
+            System.out.printf("%2d |", i);
+        }
+        System.out.println();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            System.out.print("|");
             for (int j = 0; j < BOARD_SIZE; j++) {
+                System.out.print(" ");
                 if (board[j][i] == null) {
                     System.out.print(" ");
                 } else if (board[j][i] == Placement.PLAYER) {
@@ -360,9 +378,13 @@ public class FiveInARow {
                 } else {
                     System.out.print("O");
                 }
+                System.out.print(" |");
             }
             System.out.println();
         }
-        System.out.println("---------------");
+        for (int i = 0; i < BOARD_SIZE * 4 + 1; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
     }
 }
