@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.edsv.FiveInARow;
 import com.edsv.MoveInfo;
-import com.edsv.MoveResult;
 import com.edsv.Placement;
 
 public class FiveInARowTest {
@@ -97,10 +96,10 @@ public class FiveInARowTest {
         game.place(3, 14, Placement.COMPUTER);
         // game.place(4, 0, Placement.PLAYER);
         assertTrue(game.isPlayerTurn());
-        MoveInfo p = game.immediatePlayerWin();
+        MoveInfo p = game.immediateWin(Placement.PLAYER);
         assertEquals(4, p.x());
         assertEquals(0, p.y());
-        assertEquals(MoveResult.PLAYER_WIN, p.result());
+        assertEquals(Integer.MIN_VALUE, p.result());
     }
 
     @Test
@@ -114,7 +113,7 @@ public class FiveInARowTest {
         game.place(2, 14, Placement.COMPUTER);
         game.place(0, 1, Placement.PLAYER);
         game.place(3, 14, Placement.COMPUTER);
-        assertNull(game.immediatePlayerWin());
+        assertNull(game.immediateWin(Placement.PLAYER));
     }
 
     @Test
@@ -129,7 +128,7 @@ public class FiveInARowTest {
     public void testCompMove() {
         FiveInARow game = new FiveInARow(true);
         game.place(0, 0, Placement.PLAYER);
-        MoveInfo p = game.findCompMove(true);
+        MoveInfo p = game.findCompMove();
         game.place(p.x(), p.y(), Placement.COMPUTER);
     }
 
@@ -144,8 +143,8 @@ public class FiveInARowTest {
         game.place(12, 0, Placement.COMPUTER);
         game.place(4, 0, Placement.PLAYER);
         game.place(11, 0, Placement.COMPUTER);
-        assertNotNull(game.immediatePlayerWin());
-        assertEquals(2, game.getSegments(Placement.PLAYER).stream().findFirst().get().openEnds());
+        assertNotNull(game.immediateWin(Placement.PLAYER));
+        assertEquals(2, game.getSegmentsCount(Placement.PLAYER).keySet().stream().findFirst().get().openEnds());
     }
 
     @Test
@@ -159,8 +158,8 @@ public class FiveInARowTest {
         game.place(0, 12, Placement.COMPUTER);
         game.place(0, 4, Placement.PLAYER);
         game.place(0, 11, Placement.COMPUTER);
-        assertNotNull(game.immediatePlayerWin());
-        assertEquals(2, game.getSegments(Placement.PLAYER).stream().findFirst().get().openEnds());
+        assertNotNull(game.immediateWin(Placement.PLAYER));
+        assertEquals(2, game.getSegmentsCount(Placement.PLAYER).keySet().stream().findFirst().get().openEnds());
     }
 
     @Test
@@ -174,8 +173,8 @@ public class FiveInARowTest {
         game.place(12, 12, Placement.COMPUTER);
         game.place(4, 4, Placement.PLAYER);
         game.place(11, 11, Placement.COMPUTER);
-        assertNotNull(game.immediatePlayerWin());
-        assertEquals(2, game.getSegments(Placement.PLAYER).stream().findFirst().get().openEnds());
-        assertEquals(null, game.getSegments(Placement.COMPUTER));
+        assertNotNull(game.immediateWin(Placement.PLAYER));
+        assertEquals(2, game.getSegmentsCount(Placement.PLAYER).keySet().stream().findFirst().get().openEnds());
+        assertEquals(1, game.getSegmentsCount(Placement.COMPUTER).entrySet().stream().findFirst().get().getValue());
     }
 }
