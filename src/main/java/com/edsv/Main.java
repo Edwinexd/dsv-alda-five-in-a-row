@@ -51,7 +51,7 @@ public class Main {
         FiveInARow game = new FiveInARow(true);
         while (true) {
             System.out.println(game.getSegmentsCount(Placement.PLAYER));
-            MoveInfo p = game.findPlayerMove(3, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            MoveInfo p = game.findPlayerMove();
             System.out.println(p + ", " + Placement.PLAYER);
             game.place(p.x(), p.y(), Placement.PLAYER);
             p = game.findCompMove();
@@ -75,13 +75,14 @@ public class Main {
                     return;
                 }
             }
+            System.out.println(game.evaluateUsingCounts());
         }
     }
 
     public static void main(String[] args) {
-        testCompVsComp();
-        testCompMove();
         if (true) {
+            testCompVsComp();
+            testCompMove();
             return;
         }
         FiveInARow game = new FiveInARow(true);
@@ -91,6 +92,7 @@ public class Main {
             game.place(input[0], input[1], Placement.PLAYER);
             MoveInfo compMove = game.findCompMove();
             game.place(compMove.x(), compMove.y(), Placement.COMPUTER);
+            System.out.println(game.evaluateUsingCounts());
         }
     }
 }

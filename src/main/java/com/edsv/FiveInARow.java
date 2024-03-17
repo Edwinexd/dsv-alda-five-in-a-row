@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 public class FiveInARow {
     private static final int BOARD_SIZE = 15;
     private static final int WINNING_COUNT = 5;
+    private static final int MAX_DEPTH = 3;
     private Placement[][] board = new Placement[BOARD_SIZE][BOARD_SIZE];
     private boolean playerTurn;
 
@@ -228,9 +229,9 @@ public class FiveInARow {
             return 0;
         }
         if (playerSegments.isEmpty()) {
-            return -calculateSegmentValue(computerSegments.pollLastEntry());
+            return calculateSegmentValue(computerSegments.pollLastEntry());
         }
-        return calculateSegmentValue(playerSegments.pollLastEntry());
+        return -calculateSegmentValue(playerSegments.pollLastEntry());
     }
 
     private int calculateSegmentValue(Entry<Segment, Integer> entry) {
@@ -273,10 +274,10 @@ public class FiveInARow {
     }
 
     public MoveInfo findCompMove() {
-        return findCompMove(3, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        return findCompMove(MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
-    public MoveInfo findCompMove(int remainingDepth, int alpha, int beta) {
+    private MoveInfo findCompMove(int remainingDepth, int alpha, int beta) {
         MoveInfo bestMove = new MoveInfo(-1, -1, alpha);
 
         if (isFull()) {
@@ -311,7 +312,11 @@ public class FiveInARow {
         return bestMove;
     }
 
-    public MoveInfo findPlayerMove(int remainingDepth, int alpha, int beta) {
+    public MoveInfo findPlayerMove() {
+        return findPlayerMove(MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    private MoveInfo findPlayerMove(int remainingDepth, int alpha, int beta) {
         MoveInfo bestMove = new MoveInfo(-1, -1, beta);
 
         if (isFull()) {
