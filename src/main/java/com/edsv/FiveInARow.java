@@ -209,8 +209,139 @@ public class FiveInARow {
         return segments;
     }
 
+    // TODO: Doesn't work
+    public TreeMap<Segment, Integer> getSegmentsCount2(Placement player) {
+        TreeMap<Segment, Integer> segments = new TreeMap<>();
+        int currentCount = 0;
+        int openEnds = 0;
+        // Look for horizontal
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (board[i][j] == player) {
+                    currentCount++;
+                } else if (board[i][j] == null) {
+                    openEnds++;
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 1;
+                } else {
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 0;
+                }
+            }
+            if (currentCount > 1 && openEnds > 0) {
+                segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+            }
+            currentCount = 0;
+            openEnds = 0;
+        }
+
+        // Look for vertical
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (board[j][i] == player) {
+                    currentCount++;
+                } else if (board[j][i] == null) {
+                    openEnds++;
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 1;
+                } else {
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 0;
+                }
+            }
+            if (currentCount > 1 && openEnds > 0) {
+                segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+            }
+            currentCount = 0;
+            openEnds = 0;
+        }
+
+        // Look for diagonal bottom left to top right
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (i + j >= BOARD_SIZE) {
+                    break;
+                }
+                if (board[i + j][j] == player) {
+                    currentCount++;
+                } else if (board[i + j][j] == null) {
+                    openEnds++;
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 1;
+                } else {
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 0;
+                }
+            }
+            if (currentCount > 1 && openEnds > 0) {
+                segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+            }
+            currentCount = 0;
+            openEnds = 0;
+        }
+
+        // Diagonal top left to bottom right
+        for (int i = BOARD_SIZE - 1; i >= 0; i--) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (i - j < 0) {
+                    break;
+                }
+                if (board[j][i - j] == player) {
+                    currentCount++;
+                } else if (board[j][i - j] == null) {
+                    openEnds++;
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 1;
+                } else {
+                    if (currentCount > 1 && openEnds > 0) {
+                        segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+                    }
+                    currentCount = 0;
+                    openEnds = 0;
+                }
+            }
+            if (currentCount > 1 && openEnds > 0) {
+                segments.put(new Segment(currentCount, openEnds), segments.getOrDefault(new Segment(currentCount, openEnds), 0) + 1);
+            }
+            currentCount = 0;
+            openEnds = 0;
+        }
+
+
+
+        return segments;
+    }
+
     public int evaluateUsingCounts() {
         TreeMap<Segment, Integer> playerSegments = getSegmentsCount(Placement.PLAYER);
+        TreeMap<Segment, Integer> playerSegments2 = getSegmentsCount2(Placement.PLAYER);
+
+        if (!playerSegments.equals(playerSegments2)) {
+            printBoard();
+            playerSegments2 = getSegmentsCount2(Placement.PLAYER);
+            throw new RuntimeException("The two methods of getting segments count are not equal");
+        }
         TreeMap<Segment, Integer> computerSegments = getSegmentsCount(Placement.COMPUTER);
 
         while(!playerSegments.isEmpty() && !computerSegments.isEmpty()) {
